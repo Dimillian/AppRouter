@@ -10,14 +10,8 @@ jobs:
   test-macos:
     name: Test macOS
     runs-on: macos-latest
-    strategy:
-      matrix:
-        xcode: ['16.3']
     steps:
     - uses: actions/checkout@v4
-    
-    - name: Select Xcode
-      run: sudo xcode-select -switch /Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer
     
     - name: Show Swift version
       run: swift --version
@@ -33,12 +27,9 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        destination: ['platform=iOS Simulator,name=iPhone 16,OS=18.0']
+        destination: ['platform=iOS Simulator,name=iPhone 16']
     steps:
     - uses: actions/checkout@v4
-    
-    - name: Select Xcode
-      run: sudo xcode-select -switch /Applications/Xcode_16.3.app/Contents/Developer
     
     - name: Show available simulators
       run: xcrun simctl list devices available
@@ -62,20 +53,17 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Select Xcode
-      run: sudo xcode-select -switch /Applications/Xcode_16.3.app/Contents/Developer
-    
     - name: Test on tvOS Simulator
       run: |
         xcodebuild test \
           -scheme AppRouter \
-          -destination 'platform=tvOS Simulator,name=Apple TV,OS=18.0'
+          -destination 'platform=tvOS Simulator,name=Apple TV'
     
     - name: Build for tvOS Simulator
       run: |
         xcodebuild build \
           -scheme AppRouter \
-          -destination 'platform=tvOS Simulator,name=Apple TV,OS=18.0'
+          -destination 'platform=tvOS Simulator,name=Apple TV'
 
   test-watchos-simulator:
     name: Test watchOS Simulator
@@ -83,23 +71,17 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Select Xcode
-      run: sudo xcode-select -switch /Applications/Xcode_16.3.app/Contents/Developer
-    
     - name: Build for watchOS Simulator (testing not supported)
       run: |
         xcodebuild build \
           -scheme AppRouter \
-          -destination 'platform=watchOS Simulator,name=Apple Watch Series 10 (46mm),OS=11.0'
+          -destination 'platform=watchOS Simulator,name=Apple Watch Series 10 (46mm)'
 
   swift-package-manager:
     name: Swift Package Manager
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v4
-    
-    - name: Select Xcode  
-      run: sudo xcode-select -switch /Applications/Xcode_16.3.app/Contents/Developer
     
     - name: Resolve dependencies
       run: swift package resolve
