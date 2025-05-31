@@ -1,96 +1,17 @@
-name: Tests
+name: Swift
 
-on:
-  push:
-    branches: [ main, develop ]
-  pull_request:
-    branches: [ main ]
+on: [push]
 
 jobs:
-  test-macos:
-    name: Test macOS
+  build:
+    name: Swift ${{ matrix.swift }} on ${{ matrix.os }}
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Show Swift version
-      run: swift --version
-    
-    - name: Run tests
-      run: swift test --verbose
-    
-    - name: Build package
-      run: swift build
-
-  test-ios-simulator:
-    name: Test iOS Simulator
-    runs-on: macos-latest
-    strategy:
-      matrix:
-        destination: ['platform=iOS Simulator,name=iPhone 16']
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Show available simulators
-      run: xcrun simctl list devices available
-    
-    - name: Test on iOS Simulator
-      run: |
-        xcodebuild test \
-          -scheme AppRouter \
-          -destination '${{ matrix.destination }}' \
-          -enableCodeCoverage YES
-    
-    - name: Build for iOS Simulator
-      run: |
-        xcodebuild build \
-          -scheme AppRouter \
-          -destination '${{ matrix.destination }}'
-
-  test-tvos-simulator:
-    name: Test tvOS Simulator  
-    runs-on: macos-latest
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Test on tvOS Simulator
-      run: |
-        xcodebuild test \
-          -scheme AppRouter \
-          -destination 'platform=tvOS Simulator,name=Apple TV'
-    
-    - name: Build for tvOS Simulator
-      run: |
-        xcodebuild build \
-          -scheme AppRouter \
-          -destination 'platform=tvOS Simulator,name=Apple TV'
-
-  test-watchos-simulator:
-    name: Test watchOS Simulator
-    runs-on: macos-latest  
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Build for watchOS Simulator (testing not supported)
-      run: |
-        xcodebuild build \
-          -scheme AppRouter \
-          -destination 'platform=watchOS Simulator,name=Apple Watch Series 10 (46mm)'
-
-  swift-package-manager:
-    name: Swift Package Manager
-    runs-on: macos-latest
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Resolve dependencies
-      run: swift package resolve
-    
-    - name: Build package
-      run: swift build
-    
-    - name: Run tests with SPM
-      run: swift test
-    
-    - name: Generate Xcode project
-      run: swift package generate-xcodeproj
+      - uses: swift-actions/setup-swift@65540b95f51493d65f5e59e97dcef9629ddf11bf
+        with:
+          swift-version: ${{ matrix.swift }}
+      - uses: actions/checkout@v4
+      - name: Build
+        run: swift build
+      - name: Run tests
+        run: swift test
