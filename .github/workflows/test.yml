@@ -1,0 +1,114 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-macos:
+    name: Test macOS
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        xcode: ['15.0']
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Select Xcode
+      run: sudo xcode-select -switch /Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer
+    
+    - name: Show Swift version
+      run: swift --version
+    
+    - name: Run tests
+      run: swift test --verbose
+    
+    - name: Build package
+      run: swift build
+
+  test-ios-simulator:
+    name: Test iOS Simulator
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        destination: ['platform=iOS Simulator,name=iPhone 15,OS=17.0']
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Select Xcode
+      run: sudo xcode-select -switch /Applications/Xcode_15.0.app/Contents/Developer
+    
+    - name: Show available simulators
+      run: xcrun simctl list devices available
+    
+    - name: Test on iOS Simulator
+      run: |
+        xcodebuild test \
+          -scheme AppRouter \
+          -destination '${{ matrix.destination }}' \
+          -enableCodeCoverage YES
+    
+    - name: Build for iOS Simulator
+      run: |
+        xcodebuild build \
+          -scheme AppRouter \
+          -destination '${{ matrix.destination }}'
+
+  test-tvos-simulator:
+    name: Test tvOS Simulator  
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Select Xcode
+      run: sudo xcode-select -switch /Applications/Xcode_15.0.app/Contents/Developer
+    
+    - name: Test on tvOS Simulator
+      run: |
+        xcodebuild test \
+          -scheme AppRouter \
+          -destination 'platform=tvOS Simulator,name=Apple TV,OS=17.0'
+    
+    - name: Build for tvOS Simulator
+      run: |
+        xcodebuild build \
+          -scheme AppRouter \
+          -destination 'platform=tvOS Simulator,name=Apple TV,OS=17.0'
+
+  test-watchos-simulator:
+    name: Test watchOS Simulator
+    runs-on: macos-latest  
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Select Xcode
+      run: sudo xcode-select -switch /Applications/Xcode_15.0.app/Contents/Developer
+    
+    - name: Build for watchOS Simulator (testing not supported)
+      run: |
+        xcodebuild build \
+          -scheme AppRouter \
+          -destination 'platform=watchOS Simulator,name=Apple Watch Series 9 (45mm),OS=10.0'
+
+  swift-package-manager:
+    name: Swift Package Manager
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Select Xcode  
+      run: sudo xcode-select -switch /Applications/Xcode_15.0.app/Contents/Developer
+    
+    - name: Resolve dependencies
+      run: swift package resolve
+    
+    - name: Build package
+      run: swift build
+    
+    - name: Run tests with SPM
+      run: swift test
+    
+    - name: Generate Xcode project
+      run: swift package generate-xcodeproj
