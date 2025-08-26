@@ -18,7 +18,7 @@ public final class SimpleRouter<Destination: DestinationType, Sheet: SheetType> 
   // MARK: - Initialization
 
   /// Creates a new simple router
-  public init() {}
+  nonisolated public init() {}
 
   // MARK: - Navigation Methods
 
