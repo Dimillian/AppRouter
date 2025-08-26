@@ -106,3 +106,4 @@ public final class Router<Tab: TabType, Destination: DestinationType, Sheet: She
     return navigate(to: url)
   }
 }
+
