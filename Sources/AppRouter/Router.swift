@@ -23,7 +23,7 @@ public final class Router<Tab: TabType, Destination: DestinationType, Sheet: She
 
   /// Creates a new router with the specified initial tab.
   /// - Parameter initialTab: The tab to select when the router is created
-  public init(initialTab: Tab) {
+  nonisolated public init(initialTab: Tab) {
     self.selectedTab = initialTab
   }
 
